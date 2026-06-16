@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MD Connect – Appointment Request</title>
+<style>
+  :root {
+    --purple: #4F46E5;
+    --purple-light: #EEF2FF;
+    --purple-dark: #3730A3;
+    --green: #059669;
+    --green-light: #ECFDF5;
+    --red: #DC2626;
+    --red-light: #FEF2F2;
+    --amber: #D97706;
+    --amber-light: #FFFBEB;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --border: #E5E7EB;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #F0F2F5;
+    min-height: 100vh;
+    color: var(--gray-900);
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #1E1B4B 0%, #3730A3 50%, #4F46E5 100%);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .logo-box {
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  header h1 { color: #fff; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  header p  { color: rgba(255,255,255,0.65); font-size: 13px; margin-top: 1px; }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 720px; margin: 32px auto; padding: 0 16px 48px; }
+
+  /* ── STEPPER ── */
+  .stepper {
+    display: flex; align-items: center;
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  .step-item { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+  .step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 16px; left: 55%;
+    width: 90%; height: 2px;
+    background: var(--gray-200);
+    z-index: 0;
+    transition: background 0.3s;
+  }
+  .step-item.done:not(:last-child)::after { background: var(--purple); }
+  .step-circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    background: var(--gray-200); color: var(--gray-500);
+    position: relative; z-index: 1;
+    transition: all 0.3s;
+  }
+  .step-item.active .step-circle { background: var(--purple); color: #fff; box-shadow: 0 0 0 4px var(--purple-light); }
+  .step-item.done .step-circle   { background: var(--purple); color: #fff; }
+  .step-label { font-size: 11px; color: var(--gray-400); margin-top: 6px; text-align: center; font-weight: 500; }
+  .step-item.active .step-label  { color: var(--purple); font-weight: 600; }
+  .step-item.done .step-label    { color: var(--purple); }
+
+  /* ── CARD ── */
+  .card {
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .card-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--purple-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .card-header h2 { font-size: 16px; font-weight: 600; color: var(--gray-900); }
+  .card-header p  { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+  .card-body { padding: 24px; }
+
+  /* ── FORM ELEMENTS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+  .span-2 { grid-column: 1 / -1; }
+  .field { margin-bottom: 18px; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-700); margin-bottom: 6px; }
+  label .req { color: var(--red); margin-left: 2px; }
+  input[type=text], input[type=email], input[type=tel],
+  input[type=date], input[type=time], select, textarea {
+    width: 100%; padding: 9px 12px;
+    font-size: 14px; color: var(--gray-900);
+    border: 1.5px solid var(--border);
+    border-radius: 8px; background: #fff;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px var(--purple-light);
+  }
+  input.error, select.error, textarea.error { border-color: var(--red); }
+  textarea { resize: vertical; min-height: 88px; line-height: 1.5; }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236B7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  .err-msg { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
+  .err-msg.show { display: block; }
+
+  /* Priority radio pills */
+  .priority-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .priority-group input[type=radio] { display: none; }
+  .priority-group label {
+    padding: 6px 16px; border-radius: 20px; cursor: pointer;
+    border: 1.5px solid var(--border); font-size: 13px; font-weight: 500;
+    color: var(--gray-500); margin: 0; transition: all 0.15s;
+  }
+  .priority-group input[type=radio]:checked + label.low    { background: var(--green-light); color: var(--green); border-color: var(--green); }
+  .priority-group input[type=radio]:checked + label.medium { background: var(--amber-light); color: var(--amber); border-color: var(--amber); }
+  .priority-group input[type=radio]:checked + label.high   { background: #FFF7ED; color: #C2410C; border-color: #FB923C; }
+  .priority-group input[type=radio]:checked + label.critical { background: var(--red-light); color: var(--red); border-color: var(--red); }
+
+  /* File upload */
+  .file-upload {
+    border: 1.5px dashed var(--border); border-radius: 8px;
+    padding: 18px; text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: var(--gray-50);
+  }
+  .file-upload:hover { border-color: var(--purple); background: var(--purple-light); }
+  .file-upload input { display: none; }
+  .file-upload .icon { font-size: 24px; margin-bottom: 6px; }
+  .file-upload p { font-size: 13px; color: var(--gray-500); }
+  .file-upload p span { color: var(--purple); font-weight: 500; }
+  .file-name { font-size: 12px; color: var(--green); margin-top: 6px; font-weight: 500; }
+
+  /* ── BUTTONS ── */
+  .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--gray-100); }
+  .btn {
+    padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.15s; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--purple); color: #fff; }
+  .btn-primary:hover { background: var(--purple-dark); }
+  .btn-primary:disabled { background: #A5B4FC; cursor: not-allowed; }
+  .btn-secondary { background: #fff; color: var(--gray-700); border: 1.5px solid var(--border); }
+  .btn-secondary:hover { background: var(--gray-50); }
+  .btn-ghost { background: transparent; color: var(--gray-500); padding: 10px 0; }
+
+  /* ── REVIEW PANEL ── */
+  .review-section { margin-bottom: 20px; }
+  .review-section-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--gray-400); margin-bottom: 10px;
+  }
+  .review-grid { display: grid; grid-template-columns: 140px 1fr; gap: 8px 12px; }
+  .review-key { font-size: 13px; color: var(--gray-500); }
+  .review-val { font-size: 13px; color: var(--gray-900); font-weight: 500; word-break: break-word; }
+  .review-agenda {
+    background: var(--gray-50); border-radius: 8px; padding: 12px 14px;
+    font-size: 13px; color: var(--gray-700); line-height: 1.6; margin-top: 6px;
+  }
+  .priority-badge {
+    display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  }
+  .badge-low      { background: var(--green-light); color: var(--green); }
+  .badge-medium   { background: var(--amber-light); color: var(--amber); }
+  .badge-high     { background: #FFF7ED; color: #C2410C; }
+  .badge-critical { background: var(--red-light); color: var(--red); }
+
+  .notice {
+    display: flex; gap: 10px; align-items: flex-start;
+    background: #EFF6FF; border-radius: 8px; padding: 12px 14px;
+    font-size: 13px; color: #1D4ED8; margin-top: 20px; line-height: 1.5;
+  }
+  .notice .ni { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── SUCCESS ── */
+  #step-success { display: none; }
+  .success-box {
+    text-align: center; padding: 48px 32px;
+    background: #fff; border-radius: var(--radius);
+    border: 1px solid var(--border); box-shadow: var(--shadow);
+  }
+  .success-icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--green-light); margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center; font-size: 36px;
+  }
+  .success-box h2 { font-size: 22px; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .success-box p  { font-size: 14px; color: var(--gray-500); margin-bottom: 6px; }
+  .req-id-box {
+    background: var(--purple-light); border-radius: 10px;
+    padding: 16px 24px; margin: 24px auto; display: inline-block; min-width: 200px;
+  }
+  .req-id-box span { font-size: 12px; color: var(--purple); font-weight: 500; display: block; }
+  .req-id-box strong { font-size: 28px; color: var(--purple-dark); font-weight: 800; display: block; }
+  .what-next { background: var(--gray-50); border-radius: 10px; padding: 16px 20px; text-align: left; margin: 20px 0; }
+  .what-next p { font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 10px; }
+  .next-item { display: flex; gap: 10px; font-size: 13px; color: var(--gray-600); margin-bottom: 8px; align-items: flex-start; }
+  .next-dot { width: 20px; height: 20px; border-radius: 50%; background: var(--purple-light); color: var(--purple); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── SPINNER ── */
+  .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── LOADING OVERLAY ── */
+  #loading-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(255,255,255,0.85); z-index: 100;
+    align-items: center; justify-content: center; flex-direction: column; gap: 14px;
+  }
+  #loading-overlay.show { display: flex; }
+  .spinner-lg { width: 40px; height: 40px; border: 3px solid var(--purple-light); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+  @media (max-width: 560px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .span-2 { grid-column: auto; }
+    header h1 { font-size: 17px; }
+    .card-body { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay">
+  <div class="spinner-lg"></div>
+  <p style="font-size:14px;color:var(--gray-500);font-weight:500">Submitting your request…</p>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-box">📅</div>
+  <div>
+    <h1>MD Connect</h1>
+    <p>Request an appointment with the Managing Director</p>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- STEPPER -->
+  <div class="stepper" id="stepper">
+    <div class="step-item active" id="si-1">
+      <div class="step-circle" id="sc-1">1</div>
+      <div class="step-label">Your Details</div>
+    </div>
+    <div class="step-item" id="si-2">
+      <div class="step-circle" id="sc-2">2</div>
+      <div class="step-label">Meeting Info</div>
+    </div>
+    <div class="step-item" id="si-3">
+      <div class="step-circle" id="sc-3">3</div>
+      <div class="step-label">Review</div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 1 ═══ -->
+  <div id="step-1">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">👤</div>
+        <div>
+          <h2>Your Details</h2>
+          <p>Tell us who you are so MD's team can identify your request</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="field">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" id="name" placeholder="e.g. Ravi Kumar"/>
+            <div class="err-msg" id="err-name">Please enter your full name</div>
+          </div>
+          <div class="field">
+            <label>Department <span class="req">*</span></label>
+            <select id="department">
+              <option value="">Select department</option>
+              <option>Sales</option><option>Marketing</option><option>Finance</option>
+              <option>HR</option><option>Operations</option><option>Technology</option>
+              <option>Legal</option><option>Strategy</option><option>Supply Chain</option>
+              <option>Customer Success</option><option>Procurement</option><option>Other</option>
+            </select>
+            <div class="err-msg" id="err-department">Please select your department</div>
+          </div>
+          <div class="field">
+            <label>Designation / Role</label>
+            <input type="text" id="role" placeholder="e.g. Senior Manager"/>
+          </div>
+          <div class="field">
+            <label>Employee ID</label>
+            <input type="text" id="empid" placeholder="e.g. EMP-1042"/>
+          </div>
+          <div class="field">
+            <label>Email Address <span class="req">*</span></label>
+            <input type="email" id="email" placeholder="you@company.com"/>
+            <div class="err-msg" id="err-email">Please enter a valid email</div>
+          </div>
+          <div class="field">
+            <label>Phone Number</label>
+            <input type="tel" id="phone" placeholder="+91 98765 43210"/>
+          </div>
+        </div>
+        <div class="btn-row">
+          <span></span>
+          <button class="btn btn-primary" onclick="goStep2()">Continue &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 2 ═══ -->
+  <div id="step-2" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🗓️</div>
+        <div>
+          <h2>Meeting Details</h2>
+          <p>Describe what you need and when you'd prefer to meet</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="field">
+            <label>Preferred Date <span class="req">*</span></label>
+            <input type="date" id="pref-date"/>
+            <div class="err-msg" id="err-pref-date">Please pick a preferred date</div>
+          </div>
+          <div class="field">
+            <label>Preferred Time <span class="req">*</span></label>
+            <input type="time" id="pref-time"/>
+            <div class="err-msg" id="err-pref-time">Please pick a preferred time</div>
+          </div>
+          <div class="field">
+            <label>Alternate Date</label>
+            <input type="date" id="alt-date"/>
+          </div>
+          <div class="field">
+            <label>Alternate Time</label>
+            <input type="time" id="alt-time"/>
+          </div>
+          <div class="field">
+            <label>Duration Needed <span class="req">*</span></label>
+            <select id="duration">
+              <option value="">Select duration</option>
+              <option>15 minutes</option><option>30 minutes</option>
+              <option>45 minutes</option><option>60 minutes</option><option>90 minutes</option>
+            </select>
+            <div class="err-msg" id="err-duration">Please select duration</div>
+          </div>
+          <div class="field">
+            <label>Purpose of Meeting <span class="req">*</span></label>
+            <select id="purpose">
+              <option value="">Select purpose</option>
+              <option>Business Update</option><option>Project Review</option>
+              <option>Budget Discussion</option><option>Escalation</option>
+              <option>New Initiative Pitch</option><option>Performance Review</option>
+              <option>Vendor / Partner Meeting</option><option>Recruitment Decision</option>
+              <option>Strategic Planning</option><option>Other</option>
+            </select>
+            <div class="err-msg" id="err-purpose">Please select a purpose</div>
+          </div>
+          <div class="field span-2">
+            <label>Priority Level <span class="req">*</span></label>
+            <div class="priority-group" id="priority-group">
+              <input type="radio" name="priority" id="p-low" value="Low"/>
+              <label for="p-low" class="low">🟢 Low</label>
+              <input type="radio" name="priority" id="p-med" value="Medium" checked/>
+              <label for="p-med" class="medium">🟡 Medium</label>
+              <input type="radio" name="priority" id="p-high" value="High"/>
+              <label for="p-high" class="high">🟠 High</label>
+              <input type="radio" name="priority" id="p-crit" value="Critical"/>
+              <label for="p-crit" class="critical">🔴 Critical</label>
+            </div>
+          </div>
+          <div class="field span-2">
+            <label>Agenda / Key Discussion Points <span class="req">*</span></label>
+            <textarea id="agenda" placeholder="Briefly describe what you'd like to discuss. E.g. Q3 sales shortfall, approval needed for new hire, vendor escalation…"></textarea>
+            <div class="err-msg" id="err-agenda">Please describe your agenda</div>
+          </div>
+          <div class="field span-2">
+            <label>Supporting Document <span style="color:var(--gray-400);font-weight:400">(optional)</span></label>
+            <label class="file-upload" for="file-input">
+              <input type="file" id="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.png" onchange="handleFile(this)"/>
+              <div class="icon">📎</div>
+              <p><span>Click to upload</span> or drag & drop</p>
+              <p style="font-size:11px;margin-top:2px">PDF, Word, Excel, PPT, Images (max 10MB)</p>
+              <div class="file-name" id="file-name"></div>
+            </label>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="goBack(1)">&larr; Back</button>
+          <button class="btn btn-primary" onclick="goStep3()">Review Request &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3 – REVIEW ═══ -->
+  <div id="step-3" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">✅</div>
+        <div>
+          <h2>Review & Submit</h2>
+          <p>Check everything before sending your request to MD's office</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="review-section">
+          <div class="review-section-title">Requester Information</div>
+          <div class="review-grid" id="rv-person"></div>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--gray-100);margin:16px 0"/>
+        <div class="review-section">
+          <div class="review-section-title">Meeting Details</div>
+          <div class="review-grid" id="rv-meeting"></div>
+        </div>
+        <div class="review-section" style="margin-top:12px">
+          <div class="review-section-title">Agenda</div>
+          <div class="review-agenda" id="rv-agenda"></div>
+        </div>
+        <div class="notice">
+          <span class="ni">ℹ️</span>
+          <span>Once submitted, MD's EA will review your request. You'll receive email updates at every step — including a calendar invite once the meeting is confirmed.</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="goBack(2)">&larr; Edit</button>
+          <button class="btn btn-primary" id="submit-btn" onclick="submitForm()">
+            <span id="btn-text">Submit Request</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SUCCESS ═══ -->
+  <div id="step-success">
+    <div class="success-box">
+      <div class="success-icon">✅</div>
+      <h2>Request Submitted!</h2>
+      <p>Your appointment request has been sent to MD's office.</p>
+      <div class="req-id-box">
+        <span>Your Request ID</span>
+        <strong id="success-id">MDC-0000</strong>
+      </div>
+      <div class="what-next">
+        <p>What happens next:</p>
+        <div class="next-item"><div class="next-dot">1</div><span>MD's EA reviews your request and checks MD's calendar availability</span></div>
+        <div class="next-item"><div class="next-dot">2</div><span>EA forwards to MD for approval (if needed)</span></div>
+        <div class="next-item"><div class="next-dot">3</div><span>You receive a meeting confirmation with a calendar invite to your email</span></div>
+      </div>
+      <p style="font-size:13px;color:var(--gray-400)">Save your Request ID for future reference.</p>
+      <button class="btn btn-primary" style="margin-top:20px" onclick="resetForm()">Submit Another Request</button>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+// PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE after deploying
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3VNHbvAzhqz0geSGAqw43fZzEW2NaauE1RNF3hF-LoucNGuijZ2F6yEZdqPl6nsqP/exec";
+// ────────────────────────────────────────────────────────
+
+let currentStep = 1;
+
+// Set min date to today
+document.addEventListener("DOMContentLoaded", () => {
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("pref-date").min = today;
+  document.getElementById("alt-date").min = today;
+});
+
+function handleFile(input) {
+  const file = input.files[0];
+  document.getElementById("file-name").textContent = file ? "📄 " + file.name : "";
+}
+
+// ── VALIDATION ──────────────────────────────────────────
+function val(id, check, errId) {
+  const el = document.getElementById(id);
+  const ok = check(el.value.trim());
+  el.classList.toggle("error", !ok);
+  document.getElementById(errId).classList.toggle("show", !ok);
+  return ok;
+}
+
+function validateStep1() {
+  const a = val("name",       v => v.length > 1,              "err-name");
+  const b = val("department", v => v !== "",                   "err-department");
+  const c = val("email",      v => /\S+@\S+\.\S+/.test(v),   "err-email");
+  return a && b && c;
+}
+
+function validateStep2() {
+  const a = val("pref-date", v => v !== "",  "err-pref-date");
+  const b = val("pref-time", v => v !== "",  "err-pref-time");
+  const c = val("duration",  v => v !== "",  "err-duration");
+  const d = val("purpose",   v => v !== "",  "err-purpose");
+  const e = val("agenda",    v => v.length > 10, "err-agenda");
+  return a && b && c && d && e;
+}
+
+// ── NAVIGATION ──────────────────────────────────────────
+function goStep2() {
+  if (!validateStep1()) return;
+  show(1, 2);
+}
+
+function goStep3() {
+  if (!validateStep2()) return;
+  buildReview();
+  show(2, 3);
+}
+
+function goBack(from) { show(from, from - 1); }
+
+function show(hideStep, showStep) {
+  document.getElementById("step-" + hideStep).style.display = "none";
+  document.getElementById("step-" + showStep).style.display = "block";
+  currentStep = showStep;
+  updateStepper(showStep);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function updateStepper(active) {
+  [1, 2, 3].forEach(i => {
+    const item = document.getElementById("si-" + i);
+    const circ = document.getElementById("sc-" + i);
+    item.classList.remove("active", "done");
+    if (i < active) {
+      item.classList.add("done");
+      circ.innerHTML = "✓";
+    } else if (i === active) {
+      item.classList.add("active");
+      circ.textContent = i;
+    } else {
+      circ.textContent = i;
+    }
+  });
+}
+
+// ── BUILD REVIEW ────────────────────────────────────────
+function buildReview() {
+  const priority = document.querySelector('input[name="priority"]:checked').value;
+  const badgeClass = { Low:"badge-low", Medium:"badge-medium", High:"badge-high", Critical:"badge-critical" }[priority];
+  const fileName = document.getElementById("file-name").textContent;
+
+  rvGrid("rv-person", [
+    ["Full Name",   g("name")],
+    ["Department",  g("department")],
+    ["Role",        g("role") || "—"],
+    ["Employee ID", g("empid") || "—"],
+    ["Email",       g("email")],
+    ["Phone",       g("phone") || "—"],
+  ]);
+
+  rvGrid("rv-meeting", [
+    ["Preferred Slot", g("pref-date") + " at " + fmt12(g("pref-time"))],
+    ["Alternate Slot", g("alt-date") ? g("alt-date") + " at " + fmt12(g("alt-time")) : "—"],
+    ["Duration",    g("duration")],
+    ["Purpose",     g("purpose")],
+    ["Priority",    `<span class="priority-badge ${badgeClass}">${priority}</span>`],
+    ["Attachment",  fileName || "None"],
+  ]);
+
+  document.getElementById("rv-agenda").textContent = g("agenda");
+}
+
+function rvGrid(id, rows) {
+  document.getElementById(id).innerHTML = rows
+    .map(([k, v]) => `<div class="review-key">${k}</div><div class="review-val">${v}</div>`)
+    .join("");
+}
+
+function g(id) { return document.getElementById(id).value; }
+function fmt12(t) {
+  if (!t) return "";
+  const [h, m] = t.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  return `${h % 12 || 12}:${String(m).padStart(2,"0")} ${ampm}`;
+}
+
+// ── SUBMIT ──────────────────────────────────────────────
+async function submitForm() {
+  const btn = document.getElementById("submit-btn");
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Submitting…';
+  document.getElementById("loading-overlay").classList.add("show");
+
+  const priority = document.querySelector('input[name="priority"]:checked').value;
+  const requestId = "MDC-" + String(Date.now()).slice(-6);
+
+  const payload = {
+    requestId,
+    name:        g("name"),
+    department:  g("department"),
+    role:        g("role"),
+    empId:       g("empid"),
+    email:       g("email"),
+    phone:       g("phone"),
+    prefDate:    g("pref-date"),
+    prefTime:    fmt12(g("pref-time")),
+    altDate:     g("alt-date"),
+    altTime:     g("alt-time") ? fmt12(g("alt-time")) : "",
+    duration:    g("duration"),
+    purpose:     g("purpose"),
+    priority,
+    agenda:      g("agenda"),
+    attachment:  document.getElementById("file-name").textContent || "None",
+    submittedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+  };
+
+  try {
+    if (SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
+      // Demo mode — no real URL yet
+      await new Promise(r => setTimeout(r, 1500));
+    } else {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    }
+    document.getElementById("success-id").textContent = requestId;
+    document.getElementById("loading-overlay").classList.remove("show");
+    document.getElementById("stepper").style.display = "none";
+    ["step-1","step-2","step-3"].forEach(s => document.getElementById(s).style.display = "none");
+    document.getElementById("step-success").style.display = "block";
+  } catch (err) {
+    document.getElementById("loading-overlay").classList.remove("show");
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Request';
+    alert("Something went wrong. Please try again or contact MD Desk directly.");
+  }
+}
+
+function resetForm() {
+  document.getElementById("stepper").style.display = "flex";
+  document.getElementById("step-success").style.display = "none";
+  document.getElementById("step-1").style.display = "block";
+  ["name","role","empid","email","phone","pref-date","pref-time","alt-date","alt-time","agenda"]
+    .forEach(id => document.getElementById(id).value = "");
+  ["department","duration","purpose"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("p-med").checked = true;
+  document.getElementById("file-name").textContent = "";
+  document.getElementById("submit-btn").disabled = false;
+  document.getElementById("submit-btn").innerHTML = 'Submit Request';
+  currentStep = 1;
+  updateStepper(1);
+  window.scrollTo({ top: 0 });
+}
+</script>
+</body>
+</html>
