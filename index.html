@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MD Connect – DAC Developers</title>
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #ECF0F8;
+  min-height: 100vh;
+  color: #111827;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(135deg, #001A8C 0%, #0033CC 55%, #1A4FE8 100%);
+  border-bottom: 4px solid #E84B1A;
+  box-shadow: 0 2px 10px rgba(0,33,153,0.3);
+}
+.hdr-inner {
+  max-width: 900px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 24px;
+}
+.logo-area { display: flex; align-items: center; gap: 16px; }
+.dac-logo  { height: 44px; width: auto; display: block; }
+.hdr-divider { width: 1px; height: 36px; background: rgba(255,255,255,0.2); }
+.hdr-title h1 { color: #fff; font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
+.hdr-title p  { color: rgba(255,255,255,0.55); font-size: 11.5px; margin-top: 1px; }
+.hdr-pill {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px; padding: 5px 14px;
+  color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 500;
+  white-space: nowrap;
+}
+.tagline {
+  background: #C8A840; text-align: center;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em; color: #fff;
+  padding: 4px 0;
+}
+
+/* ── PAGE WRAPPER ── */
+.page { max-width: 900px; margin: 24px auto 56px; padding: 0 20px; }
+
+/* ── INTRO BANNER ── */
+.intro {
+  background: #fff; border-radius: 10px; border: 1px solid #E2E6EF;
+  padding: 14px 18px; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.intro-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: #E8EEFF; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.intro p { font-size: 13px; color: #6B7280; }
+.intro p strong { color: #111827; }
+
+/* ── CARD ── */
+.card {
+  background: #fff; border-radius: 10px;
+  border: 1px solid #E2E6EF;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  overflow: hidden; margin-bottom: 16px;
+}
+.card-head {
+  padding: 12px 20px; border-bottom: 1px solid #F1F3F7;
+  background: #F8F9FB;
+  display: flex; align-items: center; gap: 10px;
+}
+.card-head-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: #E8EEFF;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.card-head h2 { font-size: 13.5px; font-weight: 600; color: #002299; }
+.card-body { padding: 20px 22px; }
+
+/* ── GRID LAYOUTS ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 22px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 18px; }
+.col-span-2 { grid-column: 1 / -1; }
+.col-span-3 { grid-column: 1 / -1; }
+
+/* ── FORM FIELDS ── */
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+
+.field label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: #374151; margin-bottom: 5px; letter-spacing: 0.01em;
+}
+.field label .req { color: #E84B1A; margin-left: 2px; }
+.field label .opt { color: #9CA3AF; font-weight: 400; font-size: 11px; margin-left: 3px; }
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+select, textarea {
+  width: 100%; padding: 8px 12px;
+  font-size: 13.5px; color: #111827;
+  border: 1.5px solid #E2E6EF; border-radius: 8px;
+  background: #fff; outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #0033CC; box-shadow: 0 0 0 3px #E8EEFF;
+}
+input.err, select.err, textarea.err { border-color: #DC2626; }
+textarea { resize: vertical; min-height: 88px; line-height: 1.55; }
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236B7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+/* ── TIME PICKER ROW ── */
+.time-row { display: flex; gap: 6px; }
+.time-row select { flex: 1; min-width: 0; }
+
+/* ── ERROR MESSAGES ── */
+.err-msg { font-size: 11.5px; color: #DC2626; margin-top: 4px; display: none; }
+.err-msg.show { display: block; }
+
+/* ── PRIORITY PILLS ── */
+.pill-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.pill-group input[type="radio"] { display: none; }
+.pill-group label {
+  padding: 5px 16px; border-radius: 20px; cursor: pointer;
+  border: 1.5px solid #E2E6EF; font-size: 12.5px; font-weight: 600;
+  color: #6B7280; transition: all 0.15s; user-select: none;
+}
+.pill-group input[type="radio"]:checked + label.p-low  { background:#ECFDF5; color:#059669; border-color:#059669; }
+.pill-group input[type="radio"]:checked + label.p-med  { background:#FBF6E7; color:#92680A; border-color:#C8A840; }
+.pill-group input[type="radio"]:checked + label.p-high { background:#FFF7ED; color:#C2410C; border-color:#FB923C; }
+.pill-group input[type="radio"]:checked + label.p-crit { background:#FEF2F2; color:#DC2626; border-color:#DC2626; }
+
+/* ── FILE UPLOAD ── */
+.file-drop {
+  border: 1.5px dashed #D1D5DB; border-radius: 8px;
+  padding: 16px 12px; text-align: center; cursor: pointer;
+  background: #F9FAFB; transition: border-color 0.2s, background 0.2s;
+}
+.file-drop:hover { border-color: #0033CC; background: #EEF2FF; }
+.file-drop input { display: none; }
+.file-drop .upload-icon { font-size: 22px; margin-bottom: 5px; }
+.file-drop .upload-text { font-size: 12.5px; color: #6B7280; }
+.file-drop .upload-text span { color: #0033CC; font-weight: 600; }
+.file-drop .upload-hint { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+.file-chosen { font-size: 12px; color: #059669; font-weight: 500; margin-top: 5px; }
+
+/* ── SUBMIT FOOTER ── */
+.submit-bar {
+  padding: 16px 22px; border-top: 1px solid #F1F3F7;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+}
+.req-note { font-size: 12px; color: #9CA3AF; }
+.req-note span { color: #E84B1A; }
+.btn-submit {
+  background: #0033CC; color: #fff;
+  border: none; border-radius: 8px;
+  padding: 10px 28px; font-size: 14px; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: background 0.15s;
+}
+.btn-submit:hover  { background: #002299; }
+.btn-submit:disabled { background: #93B0F0; cursor: not-allowed; }
+
+/* ── LOADING OVERLAY ── */
+#overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(255,255,255,0.85); z-index: 200;
+  flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+}
+#overlay.show { display: flex; }
+
+/* ── SPINNERS ── */
+.spin-sm { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; animation: spin 0.7s linear infinite; }
+.spin-lg { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #E8EEFF; border-top-color: #0033CC; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── SUCCESS SCREEN ── */
+#success-view { display: none; }
+.success-card {
+  background: #fff; border-radius: 12px;
+  border: 1px solid #E2E6EF;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 48px 32px; text-align: center; max-width: 540px; margin: 0 auto;
+}
+.success-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: #ECFDF5; margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center; font-size: 36px;
+}
+.success-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.success-card > p { font-size: 14px; color: #6B7280; }
+.id-badge { background: #E8EEFF; border-radius: 10px; padding: 14px 24px; margin: 20px auto; display: inline-block; }
+.id-badge small { font-size: 11.5px; color: #0033CC; font-weight: 600; display: block; }
+.id-badge strong { font-size: 26px; font-weight: 800; color: #002299; display: block; margin-top: 2px; }
+.next-box { background: #F8F9FB; border-radius: 10px; padding: 16px 20px; text-align: left; margin: 18px 0; }
+.next-box p { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 10px; }
+.next-item { display: flex; gap: 10px; font-size: 13px; color: #4B5563; margin-bottom: 8px; align-items: flex-start; }
+.next-num { width: 20px; height: 20px; border-radius: 50%; background: #E8EEFF; color: #0033CC; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.btn-again { background: #0033CC; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 4px; }
+.btn-again:hover { background: #002299; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .col-span-2, .col-span-3 { grid-column: auto; }
+  .hdr-pill { display: none; }
+  .hdr-inner { padding: 10px 16px; }
+  .card-body { padding: 16px; }
+  .success-card { padding: 32px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="overlay">
+  <div class="spin-lg"></div>
+  <p style="font-size:13px;color:#6B7280;font-weight:500">Submitting your request…</p>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-inner">
+    <div class="logo-area">
+      <img src="data:image/jpeg;base64,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tc80UMFyo5ZZml8TGTtLntGupaAd43HeOgotyNrmgh0heekgD/JdlaqWqpYHMq7lNXvLtQ+SNjC0acmjAB/9XMRalzEREREREREREXU4os77zSwRR1TaZ8MrnhzoRKCHRPjI2SQOSQ/SBuPIiIuircAUkz6x8dxqWGpp+IAfq4MGxA0EDUb/ANANSNCdeoIiLlTYQ4+7Utzmuk/H01KaVrWMHFmMtcHjRxc7wi4He7lY3l0REX3BWDaXC88ktPWz1G1TRUjBI0Di4oi7i2DT/daHEAdaIilCIi4OILcLvZ6i2uqJII6hoZI+MDa2CRtNGu7eNR9KIijzMERtloh3TmMNNSupHfowJJItJAxpcN2jRJu8HUFuo2dXAkRbsGE52VFsqX3ON81BI5wLaTi2vaWxt0IY4b9IxvJI38mgABEXEpsAxUTqh9Dc5InSvilax8LXxskbUPmc4N1Hjl28a6ajXlJ1IilNkt8VqtFJbYXvfHTQtia5/KQBpru3fUiIuYiIoZNgd0lsiou6rQIYzTxO7SZugMRjLXb/AAn7J8fmPNoSCRFpGX1LFcZq+luM8Usr3zFjow6MymeOZryOUkcUxh3jaAHIQCiItDcAufRdr1F1Gj4Xtm4umADpSyZm23U+C3Sdx2N/IN+nKRFzqXB7I7xQXWavkkno2RsDAHcW8M47QkOc4l36Y6EkkabuUhERSpERERERERERERERERERERERERERERERERERERERERERERERERERERERERERF//Z" alt="DAC Developers" class="dac-logo"/>
+      <div class="hdr-divider"></div>
+      <div class="hdr-title">
+        <h1>MD Connect</h1>
+        <p>Appointment Request Portal</p>
+      </div>
+    </div>
+    <div class="hdr-pill">📅 Request an Appointment</div>
+  </div>
+</header>
+<div class="tagline">DREAM &nbsp;&nbsp;·&nbsp;&nbsp; ASCEND &nbsp;&nbsp;·&nbsp;&nbsp; CONQUER</div>
+
+<!-- MAIN PAGE -->
+<div class="page">
+<div id="form-view">
+
+  <!-- INTRO -->
+  <div class="intro">
+    <div class="intro-icon">💼</div>
+    <p><strong>Request a meeting with the Managing Director.</strong> Fill in all required fields and submit. MD's EA will review your request and send a calendar invite once the meeting is confirmed.</p>
+  </div>
+
+  <!-- ══ CARD 1: REQUESTER INFO ══ -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-icon">👤</div>
+      <h2>Requester Information</h2>
+    </div>
+    <div class="card-body">
+      <div class="grid-2">
+
+        <div class="field">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="f-name" placeholder="e.g. Ravi Kumar" autocomplete="name"/>
+          <div class="err-msg" id="e-name">Please enter your full name</div>
+        </div>
+
+        <div class="field">
+          <label>Department <span class="req">*</span></label>
+          <select id="f-dept">
+            <option value="">— Select department —</option>
+            <option>Accounts</option>
+            <option>Administration</option>
+            <option>CBE - Marketing, Sales &amp; CRM</option>
+            <option>CBE - Operations</option>
+            <option>Civil</option>
+            <option>Contracts</option>
+            <option>CP Sales</option>
+            <option>CRM</option>
+            <option>Design</option>
+            <option>ERP</option>
+            <option>FED</option>
+            <option>Finance</option>
+            <option>HR</option>
+            <option>IT</option>
+            <option>Land Acquisition</option>
+            <option>Lead Audit Team</option>
+            <option>Legal</option>
+            <option>Liaison</option>
+            <option>Management Engineering</option>
+            <option>Marketing</option>
+            <option>MEP</option>
+            <option>MIS</option>
+            <option>Operations</option>
+            <option>Pre Sales</option>
+            <option>Product Development</option>
+            <option>Public Affairs</option>
+            <option>Purchase and Stores</option>
+            <option>QA/QC</option>
+            <option>QS</option>
+            <option>Safety</option>
+            <option>Sales</option>
+            <option>Survey</option>
+            <option>Team HUG</option>
+            <option>Transport</option>
+          </select>
+          <div class="err-msg" id="e-dept">Please select your department</div>
+        </div>
+
+        <div class="field">
+          <label>Designation / Role <span class="opt">(optional)</span></label>
+          <input type="text" id="f-role" placeholder="e.g. Senior Manager – Sales"/>
+        </div>
+
+        <div class="field">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" id="f-email" placeholder="you@dacdevelopers.com" autocomplete="email"/>
+          <div class="err-msg" id="e-email">Please enter a valid email address</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CARD 2: MEETING DETAILS ══ -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-icon">🗓️</div>
+      <h2>Meeting Details</h2>
+    </div>
+    <div class="card-body">
+
+      <!-- Row 1: Preferred Date / Time / Duration -->
+      <div class="grid-3">
+        <div class="field">
+          <label>Preferred Date <span class="req">*</span></label>
+          <input type="date" id="f-pdate"/>
+          <div class="err-msg" id="e-pdate">Please select a preferred date</div>
+        </div>
+        <div class="field">
+          <label>Preferred Time <span class="req">*</span></label>
+          <div class="time-row">
+            <select id="f-phr"><option value="">HH</option></select>
+            <select id="f-pmm"><option value="">MM</option></select>
+            <select id="f-pap"><option value="AM">AM</option><option value="PM">PM</option></select>
+          </div>
+          <div class="err-msg" id="e-ptime">Please select hour and minute</div>
+        </div>
+        <div class="field">
+          <label>Duration <span class="req">*</span></label>
+          <select id="f-dur">
+            <option value="">— Select —</option>
+            <option>15 minutes</option>
+            <option>30 minutes</option>
+            <option>45 minutes</option>
+            <option>60 minutes</option>
+            <option>90 minutes</option>
+          </select>
+          <div class="err-msg" id="e-dur">Please select duration</div>
+        </div>
+      </div>
+
+      <!-- Row 2: Alternate Date / Time / Purpose -->
+      <div class="grid-3">
+        <div class="field">
+          <label>Alternate Date <span class="opt">(optional)</span></label>
+          <input type="date" id="f-adate"/>
+        </div>
+        <div class="field">
+          <label>Alternate Time <span class="opt">(optional)</span></label>
+          <div class="time-row">
+            <select id="f-ahr"><option value="">HH</option></select>
+            <select id="f-amm"><option value="">MM</option></select>
+            <select id="f-aap"><option value="AM">AM</option><option value="PM">PM</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Purpose of Meeting <span class="req">*</span></label>
+          <select id="f-purp">
+            <option value="">— Select purpose —</option>
+            <option>Business Update / Review</option>
+            <option>Project Progress Update</option>
+            <option>Budget / Finance Discussion</option>
+            <option>Escalation / Issue Resolution</option>
+            <option>New Initiative / Proposal Pitch</option>
+            <option>Approval / Sign-off Required</option>
+            <option>Performance Discussion</option>
+            <option>Vendor / Partner / Client Meeting</option>
+            <option>Recruitment / HR Decision</option>
+            <option>Legal / Compliance Matter</option>
+            <option>Land / Liaison Matter</option>
+            <option>Design / Technical Review</option>
+            <option>Safety / QA Discussion</option>
+            <option>Strategic Planning</option>
+            <option>Feedback / Suggestion</option>
+            <option>Other</option>
+          </select>
+          <div class="err-msg" id="e-purp">Please select a purpose</div>
+        </div>
+      </div>
+
+      <!-- Priority -->
+      <div class="field">
+        <label>Priority Level</label>
+        <div class="pill-group">
+          <input type="radio" name="priority" id="pri-low"  value="Low"/>
+          <label for="pri-low"  class="p-low">🟢 Low</label>
+          <input type="radio" name="priority" id="pri-med"  value="Medium" checked/>
+          <label for="pri-med"  class="p-med">🟡 Medium</label>
+          <input type="radio" name="priority" id="pri-high" value="High"/>
+          <label for="pri-high" class="p-high">🟠 High</label>
+          <input type="radio" name="priority" id="pri-crit" value="Critical"/>
+          <label for="pri-crit" class="p-crit">🔴 Critical</label>
+        </div>
+      </div>
+
+      <!-- Agenda -->
+      <div class="field">
+        <label>Agenda / Discussion Points <span class="req">*</span></label>
+        <textarea id="f-agenda" placeholder="Describe what you'd like to discuss. Being specific helps MD's team prioritise and prepare effectively…"></textarea>
+        <div class="err-msg" id="e-agenda">Please describe your agenda (minimum 10 characters)</div>
+      </div>
+
+      <!-- File Upload -->
+      <div class="field" style="margin-bottom:0">
+        <label>Supporting Document <span class="opt">(optional)</span></label>
+        <label class="file-drop" for="f-file">
+          <input type="file" id="f-file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png" onchange="handleFile(this)"/>
+          <div class="upload-icon">📎</div>
+          <div class="upload-text"><span>Click to upload</span> or drag &amp; drop</div>
+          <div class="upload-hint">PDF, Word, Excel, PowerPoint, Images</div>
+          <div class="file-chosen" id="f-filename"></div>
+        </label>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SUBMIT BAR ══ -->
+  <div class="card">
+    <div class="submit-bar">
+      <span class="req-note"><span>*</span> Required fields</span>
+      <button class="btn-submit" id="submit-btn" onclick="submitForm()">
+        Submit Request &nbsp;→
+      </button>
+    </div>
+  </div>
+
+</div><!-- /form-view -->
+
+<!-- ══ SUCCESS SCREEN ══ -->
+<div id="success-view">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h2>Request Submitted!</h2>
+    <p>Your appointment request has been sent to MD's office for review.</p>
+    <div class="id-badge">
+      <small>Your Request ID</small>
+      <strong id="success-id">MDC-000000</strong>
+    </div>
+    <div class="next-box">
+      <p>What happens next:</p>
+      <div class="next-item">
+        <div class="next-num">1</div>
+        <span>MD's EA reviews your request and checks the MD's calendar for availability</span>
+      </div>
+      <div class="next-item">
+        <div class="next-num">2</div>
+        <span>You receive an email update — approval, clarification request, or reschedule suggestion</span>
+      </div>
+      <div class="next-item">
+        <div class="next-num">3</div>
+        <span>Once confirmed, a Google Calendar invite is sent directly to your email</span>
+      </div>
+    </div>
+    <p style="font-size:12px;color:#9CA3AF;margin-bottom:20px">Please save your Request ID for reference.</p>
+    <button class="btn-again" onclick="resetForm()">Submit Another Request</button>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<script>
+// ── APPS SCRIPT ENDPOINT ──────────────────────────────────
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIbd9MjaqlGccxLyJBALprZibyloNjw_Sn60-xiGirywnR6ht7GluknPNKL-AYB3MhtQ/exec";
+
+// ── BUILD TIME DROPDOWNS ──────────────────────────────────
+function buildTimePickers() {
+  ["f-phr","f-ahr"].forEach(id => {
+    const s = document.getElementById(id);
+    for (let h = 1; h <= 12; h++) {
+      const v = String(h).padStart(2,"0");
+      s.innerHTML += `<option value="${v}">${v}</option>`;
+    }
+  });
+  ["f-pmm","f-amm"].forEach(id => {
+    const s = document.getElementById(id);
+    ["00","05","10","15","20","25","30","35","40","45","50","55"]
+      .forEach(m => s.innerHTML += `<option value="${m}">${m}</option>`);
+  });
+}
+
+function getTime(hId, mId, aId) {
+  const h = document.getElementById(hId).value;
+  const m = document.getElementById(mId).value;
+  const a = document.getElementById(aId).value;
+  return (h && m) ? `${h}:${m} ${a}` : "";
+}
+
+// ── FILE HANDLER ─────────────────────────────────────────
+function handleFile(inp) {
+  const el = document.getElementById("f-filename");
+  el.textContent = inp.files[0] ? "📄 " + inp.files[0].name : "";
+}
+
+// ── INIT ─────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  buildTimePickers();
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("f-pdate").min = today;
+  document.getElementById("f-adate").min = today;
+});
+
+// ── VALIDATION ───────────────────────────────────────────
+function validate(id, testFn, errId) {
+  const el = document.getElementById(id);
+  const ok = testFn(el ? el.value.trim() : "");
+  if (el) el.classList.toggle("err", !ok);
+  document.getElementById(errId).classList.toggle("show", !ok);
+  return ok;
+}
+
+function runValidation() {
+  const checks = [
+    validate("f-name",  v => v.length > 1,              "e-name"),
+    validate("f-dept",  v => v !== "",                   "e-dept"),
+    validate("f-email", v => /\S+@\S+\.\S+/.test(v),    "e-email"),
+    validate("f-pdate", v => v !== "",                   "e-pdate"),
+    validate("f-dur",   v => v !== "",                   "e-dur"),
+    validate("f-purp",  v => v !== "",                   "e-purp"),
+    validate("f-agenda",v => v.length > 9,               "e-agenda"),
+  ];
+  // Time check
+  const timeOk = getTime("f-phr","f-pmm","f-pap") !== "";
+  document.getElementById("e-ptime").classList.toggle("show", !timeOk);
+  document.getElementById("f-phr").classList.toggle("err", !timeOk);
+
+  const allOk = checks.every(Boolean) && timeOk;
+  if (!allOk) {
+    const firstErr = document.querySelector(".err, .err-msg.show");
+    if (firstErr) firstErr.scrollIntoView({ behavior:"smooth", block:"center" });
+  }
+  return allOk;
+}
+
+// ── SUBMIT ───────────────────────────────────────────────
+async function submitForm() {
+  if (!runValidation()) return;
+
+  const btn = document.getElementById("submit-btn");
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spin-sm"></div> Submitting…`;
+  document.getElementById("overlay").classList.add("show");
+
+  const priority = document.querySelector('input[name="priority"]:checked').value;
+  const reqId    = "MDC-" + String(Date.now()).slice(-6);
+
+  const payload = {
+    requestId  : reqId,
+    name       : document.getElementById("f-name").value.trim(),
+    department : document.getElementById("f-dept").value,
+    role       : document.getElementById("f-role").value.trim(),
+    email      : document.getElementById("f-email").value.trim(),
+    prefDate   : document.getElementById("f-pdate").value,
+    prefTime   : getTime("f-phr","f-pmm","f-pap"),
+    altDate    : document.getElementById("f-adate").value,
+    altTime    : getTime("f-ahr","f-amm","f-aap"),
+    duration   : document.getElementById("f-dur").value,
+    purpose    : document.getElementById("f-purp").value,
+    priority   : priority,
+    agenda     : document.getElementById("f-agenda").value.trim(),
+    attachment : document.getElementById("f-filename").textContent || "None",
+    submittedAt: new Date().toLocaleString("en-IN", { timeZone:"Asia/Kolkata" })
+  };
+
+  try {
+    // Send via FormData — correct way for Apps Script cross-origin POST
+    const fd = new FormData();
+    fd.append("data", JSON.stringify(payload));
+    await fetch(SCRIPT_URL, { method: "POST", body: fd, mode: "no-cors" });
+    // no-cors fetch always reaches here silently if network is fine
+    document.getElementById("overlay").classList.remove("show");
+    document.getElementById("success-id").textContent = reqId;
+    document.getElementById("form-view").style.display    = "none";
+    document.getElementById("success-view").style.display = "block";
+    window.scrollTo({ top:0, behavior:"smooth" });
+  } catch (err) {
+    document.getElementById("overlay").classList.remove("show");
+    btn.disabled = false;
+    btn.innerHTML = "Submit Request &nbsp;→";
+    alert("Network error. Please check your internet connection and try again.");
+  }
+}
+
+// ── RESET ─────────────────────────────────────────────────
+function resetForm() {
+  ["f-name","f-role","f-email","f-pdate","f-adate","f-agenda"]
+    .forEach(id => document.getElementById(id).value = "");
+  ["f-dept","f-dur","f-purp","f-phr","f-pmm","f-ahr","f-amm"]
+    .forEach(id => document.getElementById(id).value = "");
+  document.getElementById("f-pap").value = "AM";
+  document.getElementById("f-aap").value = "AM";
+  document.getElementById("pri-med").checked = true;
+  document.getElementById("f-filename").textContent = "";
+  document.getElementById("submit-btn").disabled = false;
+  document.getElementById("submit-btn").innerHTML = "Submit Request &nbsp;→";
+  document.querySelectorAll(".err").forEach(el => el.classList.remove("err"));
+  document.querySelectorAll(".err-msg.show").forEach(el => el.classList.remove("show"));
+  document.getElementById("form-view").style.display    = "block";
+  document.getElementById("success-view").style.display = "none";
+  window.scrollTo({ top:0 });
+}
+</script>
+</body>
+</html>
