@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DAC MD Connect – Appointment Request</title>
+<style>
+:root {
+  --blue:#0033CC;--blue-dark:#002299;--blue-light:#E8EEFF;--blue-mid:#C5D0F5;
+  --orange:#E84B1A;--orange-light:#FEF0EB;
+  --gold:#C8A840;--gold-light:#FBF6E7;
+  --gray-50:#F8F9FB;--gray-100:#F1F3F7;--gray-200:#E2E6EF;
+  --gray-400:#9CA3AF;--gray-500:#6B7280;--gray-700:#374151;--gray-900:#111827;
+  --green:#059669;--green-light:#ECFDF5;
+  --red:#DC2626;--red-light:#FEF2F2;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#EEF1F8;min-height:100vh;color:var(--gray-900);}
+
+header{background:linear-gradient(135deg,#001A8C 0%,#0033CC 60%,#1A4FE8 100%);border-bottom:4px solid var(--orange);box-shadow:0 2px 12px rgba(0,51,204,0.25);}
+.hdr{max-width:860px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;}
+.logo-area{display:flex;align-items:center;gap:14px;}
+.logo-img{height:50px;width:auto;filter:brightness(0) invert(1);}
+.logo-fallback{color:#fff;font-size:28px;font-weight:900;letter-spacing:3px;display:none;}
+.hdiv{width:1.5px;height:38px;background:rgba(255,255,255,0.22);}
+.htext h1{color:#fff;font-size:18px;font-weight:700;}
+.htext p{color:rgba(255,255,255,0.6);font-size:12px;margin-top:2px;}
+.hbadge{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:5px 14px;color:rgba(255,255,255,0.85);font-size:12px;font-weight:500;}
+.tagline{background:var(--gold);padding:5px 20px;text-align:center;font-size:11px;font-weight:700;letter-spacing:0.15em;color:#fff;}
+
+.page{max-width:860px;margin:28px auto;padding:0 16px 48px;}
+.intro{background:#fff;border-radius:10px;border:1px solid var(--gray-200);padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
+.intro-ic{width:38px;height:38px;border-radius:9px;background:var(--blue-light);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.intro p{font-size:13px;color:var(--gray-500);line-height:1.5;}
+
+.card{background:#fff;border-radius:10px;border:1px solid var(--gray-200);box-shadow:0 1px 3px rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;}
+.sec-hdr{padding:13px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;background:var(--gray-50);}
+.sh-ic{width:28px;height:28px;border-radius:7px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:14px;}
+.sec-hdr h2{font-size:13.5px;font-weight:600;color:var(--blue-dark);}
+.cbody{padding:18px 20px;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 16px;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0 14px;}
+.s2{grid-column:1/-1;}
+
+.field{margin-bottom:15px;}
+label.lbl{display:block;font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:5px;letter-spacing:.01em;}
+.req{color:var(--orange);margin-left:2px;}
+.opt{color:var(--gray-400);font-weight:400;font-size:11px;margin-left:3px;}
+
+input[type=text],input[type=email],input[type=date],select,textarea{
+  width:100%;padding:8px 11px;font-size:13.5px;color:var(--gray-900);
+  border:1.5px solid var(--gray-200);border-radius:8px;background:#fff;
+  outline:none;transition:border-color .18s,box-shadow .18s;font-family:inherit;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-light);}
+input.err,select.err,textarea.err{border-color:var(--red);}
+textarea{resize:vertical;min-height:88px;line-height:1.55;}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%236B7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;}
+
+/* TIME PICKER */
+.time-row{display:flex;gap:6px;}
+.time-row select{flex:1;}
+
+.err-msg{font-size:11.5px;color:var(--red);margin-top:3px;display:none;}
+.err-msg.show{display:block;}
+
+/* PRIORITY */
+.pills{display:flex;gap:8px;flex-wrap:wrap;}
+.pills input[type=radio]{display:none;}
+.pills label{padding:5px 15px;border-radius:20px;cursor:pointer;border:1.5px solid var(--gray-200);font-size:12.5px;font-weight:600;color:var(--gray-500);margin:0;transition:all .15s;}
+.pills input[type=radio]:checked+label.low{background:var(--green-light);color:var(--green);border-color:var(--green);}
+.pills input[type=radio]:checked+label.med{background:var(--gold-light);color:#92680A;border-color:var(--gold);}
+.pills input[type=radio]:checked+label.high{background:#FFF7ED;color:#C2410C;border-color:#FB923C;}
+.pills input[type=radio]:checked+label.crit{background:var(--red-light);color:var(--red);border-color:var(--red);}
+
+/* FILE */
+.file-zone{border:1.5px dashed var(--gray-200);border-radius:8px;padding:14px;text-align:center;cursor:pointer;background:var(--gray-50);transition:border-color .2s,background .2s;}
+.file-zone:hover{border-color:var(--blue);background:var(--blue-light);}
+.file-zone input{display:none;}
+.fname{font-size:12px;color:var(--green);margin-top:4px;font-weight:500;}
+
+/* SUBMIT */
+.sub-area{padding:18px 20px;border-top:1px solid var(--gray-100);display:flex;justify-content:flex-end;align-items:center;gap:14px;}
+.btn-sub{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px 30px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .15s;font-family:inherit;}
+.btn-sub:hover{background:var(--blue-dark);}
+.btn-sub:disabled{background:#93B0F0;cursor:not-allowed;}
+.req-note{font-size:12px;color:var(--gray-400);}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* SUCCESS */
+#success{display:none;}
+.sbox{background:#fff;border-radius:10px;border:1px solid var(--gray-200);padding:44px 32px;text-align:center;}
+.sic{width:68px;height:68px;border-radius:50%;background:var(--green-light);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+.sbox h2{font-size:21px;font-weight:700;margin-bottom:6px;}
+.sbox>p{font-size:14px;color:var(--gray-500);}
+.idbox{background:var(--blue-light);border-radius:10px;padding:13px 22px;margin:18px auto;display:inline-block;}
+.idbox span{font-size:11.5px;color:var(--blue);font-weight:500;display:block;}
+.idbox strong{font-size:25px;font-weight:800;color:var(--blue-dark);display:block;}
+.nxt{background:var(--gray-50);border-radius:10px;padding:15px 18px;text-align:left;margin:14px 0 18px;}
+.nxt p{font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px;}
+.ni{display:flex;gap:10px;font-size:13px;color:var(--gray-600);margin-bottom:7px;align-items:flex-start;}
+.nd{width:20px;height:20px;border-radius:50%;background:var(--blue-light);color:var(--blue);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.btn-again{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+/* OVERLAY */
+#ov{display:none;position:fixed;inset:0;background:rgba(255,255,255,.82);z-index:99;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+#ov.show{display:flex;}
+.sp-lg{width:36px;height:36px;border:3px solid var(--blue-light);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;}
+
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr;}.s2{grid-column:auto;}.hbadge{display:none;}}
+</style>
+</head>
+<body>
+
+<div id="ov"><div class="sp-lg"></div><p style="font-size:13px;color:var(--gray-500);font-weight:500">Submitting your request…</p></div>
+
+<header>
+  <div class="hdr">
+    <div class="logo-area">
+      <img src="DAC_logo.jpeg" alt="DAC" class="logo-img" onerror="this.style.display='none';document.getElementById('lf').style.display='block'"/>
+      <span id="lf" class="logo-fallback">DAC</span>
+      <div class="hdiv"></div>
+      <div class="htext"><h1>MD Connect</h1><p>Appointment Request Portal</p></div>
+    </div>
+    <div class="hbadge">📅 Request an Appointment</div>
+  </div>
+</header>
+<div class="tagline">DREAM &nbsp;·&nbsp; ASCEND &nbsp;·&nbsp; CONQUER</div>
+
+<div class="page">
+ <div id="formview">
+
+  <div class="intro">
+    <div class="intro-ic">💼</div>
+    <p><strong>Request a meeting with the Managing Director.</strong> Fill in the details below and submit. MD's EA will review your request and send a calendar invite once confirmed.</p>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="card">
+    <div class="sec-hdr"><div class="sh-ic">👤</div><h2>Requester Information</h2></div>
+    <div class="cbody">
+      <div class="g2">
+        <div class="field">
+          <label class="lbl">Full Name <span class="req">*</span></label>
+          <input type="text" id="name" placeholder="e.g. Ravi Kumar"/>
+          <div class="err-msg" id="e-name">Please enter your full name</div>
+        </div>
+        <div class="field">
+          <label class="lbl">Department <span class="req">*</span></label>
+          <select id="dept">
+            <option value="">Select department</option>
+            <option>Accounts</option><option>Administration</option><option>CBE - Marketing, Sales &amp; CRM</option>
+            <option>CBE - Operations</option><option>Civil</option><option>Contracts</option>
+            <option>CP Sales</option><option>CRM</option><option>Design</option>
+            <option>ERP</option><option>FED</option><option>Finance</option>
+            <option>HR</option><option>IT</option><option>Land Acquisition</option>
+            <option>Lead Audit Team</option><option>Legal</option><option>Liaison</option>
+            <option>Management Engineering</option><option>Marketing</option><option>MEP</option>
+            <option>MIS</option><option>Operations</option><option>Pre Sales</option>
+            <option>Product Development</option><option>Public Affairs</option>
+            <option>Purchase and Stores</option><option>QA/QC</option><option>QS</option>
+            <option>Safety</option><option>Sales</option><option>Survey</option>
+            <option>Team HUG</option><option>Transport</option>
+          </select>
+          <div class="err-msg" id="e-dept">Please select your department</div>
+        </div>
+        <div class="field">
+          <label class="lbl">Designation / Role <span class="opt">(optional)</span></label>
+          <input type="text" id="role" placeholder="e.g. Senior Manager – Sales"/>
+        </div>
+        <div class="field">
+          <label class="lbl">Email Address <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="you@dac.com"/>
+          <div class="err-msg" id="e-email">Please enter a valid email address</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="card">
+    <div class="sec-hdr"><div class="sh-ic">🗓️</div><h2>Meeting Details</h2></div>
+    <div class="cbody">
+      <div class="g3">
+        <div class="field">
+          <label class="lbl">Preferred Date <span class="req">*</span></label>
+          <input type="date" id="pdate"/>
+          <div class="err-msg" id="e-pdate">Please pick a date</div>
+        </div>
+        <div class="field">
+          <label class="lbl">Preferred Time <span class="req">*</span></label>
+          <div class="time-row">
+            <select id="phr"><option value="">HH</option></select>
+            <select id="pmin"><option value="">MM</option></select>
+            <select id="pampm"><option>AM</option><option>PM</option></select>
+          </div>
+          <div class="err-msg" id="e-ptime">Please select a time</div>
+        </div>
+        <div class="field">
+          <label class="lbl">Duration <span class="req">*</span></label>
+          <select id="dur">
+            <option value="">Select</option>
+            <option>15 minutes</option><option>30 minutes</option>
+            <option>45 minutes</option><option>60 minutes</option><option>90 minutes</option>
+          </select>
+          <div class="err-msg" id="e-dur">Please select duration</div>
+        </div>
+        <div class="field">
+          <label class="lbl">Alternate Date <span class="opt">(optional)</span></label>
+          <input type="date" id="adate"/>
+        </div>
+        <div class="field">
+          <label class="lbl">Alternate Time <span class="opt">(optional)</span></label>
+          <div class="time-row">
+            <select id="ahr"><option value="">HH</option></select>
+            <select id="amin"><option value="">MM</option></select>
+            <select id="aampm"><option>AM</option><option>PM</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="lbl">Purpose of Meeting <span class="req">*</span></label>
+          <select id="purp">
+            <option value="">Select purpose</option>
+            <option>Business Update / Review</option>
+            <option>Project Progress Update</option>
+            <option>Budget / Finance Discussion</option>
+            <option>Escalation / Issue Resolution</option>
+            <option>New Initiative / Proposal Pitch</option>
+            <option>Approval / Sign-off Required</option>
+            <option>Performance Discussion</option>
+            <option>Vendor / Partner / Client Meeting</option>
+            <option>Recruitment / HR Decision</option>
+            <option>Legal / Compliance Matter</option>
+            <option>Land / Liaison Matter</option>
+            <option>Design / Technical Review</option>
+            <option>Safety / QA Discussion</option>
+            <option>Strategic Planning</option>
+            <option>Feedback / Suggestion</option>
+            <option>Other</option>
+          </select>
+          <div class="err-msg" id="e-purp">Please select a purpose</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Priority Level</label>
+        <div class="pills">
+          <input type="radio" name="pri" id="p1" value="Low"/>
+          <label for="p1" class="low">🟢 Low</label>
+          <input type="radio" name="pri" id="p2" value="Medium" checked/>
+          <label for="p2" class="med">🟡 Medium</label>
+          <input type="radio" name="pri" id="p3" value="High"/>
+          <label for="p3" class="high">🟠 High</label>
+          <input type="radio" name="pri" id="p4" value="Critical"/>
+          <label for="p4" class="crit">🔴 Critical</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">Agenda / Discussion Points <span class="req">*</span></label>
+        <textarea id="agenda" placeholder="Describe what you'd like to discuss. Be specific — this helps MD's EA prioritise and prepare…"></textarea>
+        <div class="err-msg" id="e-ag">Please describe your agenda (at least 10 characters)</div>
+      </div>
+
+      <div class="field" style="margin-bottom:0">
+        <label class="lbl">Supporting Document <span class="opt">(optional)</span></label>
+        <label class="file-zone" for="finp">
+          <input type="file" id="finp" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.png" onchange="handleFile(this)"/>
+          <div style="font-size:20px">📎</div>
+          <p style="font-size:12.5px;color:var(--gray-400);margin-top:3px"><span style="color:var(--blue);font-weight:600">Click to upload</span> or drag & drop · PDF, Word, Excel, PPT, Images</p>
+          <div class="fname" id="fname"></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sub-area">
+      <span class="req-note"><span style="color:var(--orange)">*</span> Required fields</span>
+      <button class="btn-sub" id="subbtn" onclick="submitForm()">
+        <span id="btntxt">Submit Request</span><span>→</span>
+      </button>
+    </div>
+  </div>
+
+ </div><!-- /formview -->
+
+ <!-- SUCCESS -->
+ <div id="success">
+  <div class="sbox">
+    <div class="sic">✅</div>
+    <h2>Request Submitted!</h2>
+    <p>Your appointment request has been sent to MD's EA for review.</p>
+    <div class="idbox">
+      <span>Your Request ID</span>
+      <strong id="sid">MDC-0000</strong>
+    </div>
+    <div class="nxt">
+      <p>What happens next:</p>
+      <div class="ni"><div class="nd">1</div><span>MD's EA reviews your request and checks MD's calendar</span></div>
+      <div class="ni"><div class="nd">2</div><span>You receive an approval or update email from MD's office</span></div>
+      <div class="ni"><div class="nd">3</div><span>A Google Calendar invite is sent to your email with confirmed meeting details</span></div>
+    </div>
+    <p style="font-size:12px;color:var(--gray-400);margin-bottom:18px">Save your Request ID for reference.</p>
+    <button class="btn-again" onclick="resetForm()">Submit Another Request</button>
+  </div>
+ </div>
+
+</div><!-- /page -->
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1up12Hy4QoU2OgmYNfDOOZBff3waqNPS0FsNb6_w0ASpwz8l9r2aELCX7hHcA3BdA/exec";
+
+// Build hour/min dropdowns
+function buildTime() {
+  ["phr","ahr"].forEach(id => {
+    const s = document.getElementById(id);
+    for(let h=1;h<=12;h++) s.innerHTML += `<option value="${String(h).padStart(2,'0')}">${String(h).padStart(2,'0')}</option>`;
+  });
+  ["pmin","amin"].forEach(id => {
+    const s = document.getElementById(id);
+    ["00","05","10","15","20","25","30","35","40","45","50","55"].forEach(m => s.innerHTML += `<option value="${m}">${m}</option>`);
+  });
+}
+
+function getTime(hr, min, ampm) {
+  const h = document.getElementById(hr).value;
+  const m = document.getElementById(min).value;
+  const a = document.getElementById(ampm).value;
+  if (!h || !m) return "";
+  return `${h}:${m} ${a}`;
+}
+
+function handleFile(inp) {
+  document.getElementById("fname").textContent = inp.files[0] ? "📄 "+inp.files[0].name : "";
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  buildTime();
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("pdate").min = today;
+  document.getElementById("adate").min = today;
+});
+
+function chk(id, test, eid) {
+  const el = document.getElementById(id);
+  const v  = el ? el.value.trim() : "";
+  const ok = test(v);
+  if(el){ el.classList.toggle("err",!ok); }
+  document.getElementById(eid).classList.toggle("show",!ok);
+  return ok;
+}
+
+function validate() {
+  const a = chk("name",  v=>v.length>1,             "e-name");
+  const b = chk("dept",  v=>v!=="",                  "e-dept");
+  const c = chk("email", v=>/\S+@\S+\.\S+/.test(v), "e-email");
+  const d = chk("pdate", v=>v!=="",                  "e-pdate");
+  const f = chk("dur",   v=>v!=="",                  "e-dur");
+  const g = chk("purp",  v=>v!=="",                  "e-purp");
+  const h = chk("agenda",v=>v.length>9,              "e-ag");
+  // time check
+  const ptOk = getTime("phr","pmin","pampm") !== "";
+  document.getElementById("e-ptime").classList.toggle("show", !ptOk);
+  if(!ptOk){ document.getElementById("phr").classList.add("err"); }
+  else { document.getElementById("phr").classList.remove("err"); }
+  const ok = a&&b&&c&&d&&ptOk&&f&&g&&h;
+  if(!ok){ const fe=document.querySelector(".err"); if(fe) fe.scrollIntoView({behavior:"smooth",block:"center"}); }
+  return ok;
+}
+
+async function submitForm() {
+  if(!validate()) return;
+  const btn = document.getElementById("subbtn");
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div><span>Submitting…</span>';
+  document.getElementById("ov").classList.add("show");
+
+  const pri = document.querySelector('input[name="pri"]:checked').value;
+  const id  = "MDC-" + String(Date.now()).slice(-6);
+
+  const payload = {
+    requestId:   id,
+    name:        document.getElementById("name").value.trim(),
+    department:  document.getElementById("dept").value,
+    role:        document.getElementById("role").value.trim(),
+    email:       document.getElementById("email").value.trim(),
+    prefDate:    document.getElementById("pdate").value,
+    prefTime:    getTime("phr","pmin","pampm"),
+    altDate:     document.getElementById("adate").value,
+    altTime:     getTime("ahr","amin","aampm"),
+    duration:    document.getElementById("dur").value,
+    purpose:     document.getElementById("purp").value,
+    priority:    pri,
+    agenda:      document.getElementById("agenda").value.trim(),
+    attachment:  document.getElementById("fname").textContent || "None",
+    submittedAt: new Date().toLocaleString("en-IN",{timeZone:"Asia/Kolkata"})
+  };
+
+  try {
+    if(SCRIPT_URL==="YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL"){
+      await new Promise(r=>setTimeout(r,1400));
+    } else {
+      await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(payload)});
+    }
+    document.getElementById("ov").classList.remove("show");
+    document.getElementById("sid").textContent = id;
+    document.getElementById("formview").style.display = "none";
+    document.getElementById("success").style.display  = "block";
+    window.scrollTo({top:0,behavior:"smooth"});
+  } catch(err) {
+    document.getElementById("ov").classList.remove("show");
+    btn.disabled=false;
+    btn.innerHTML='<span id="btntxt">Submit Request</span><span>→</span>';
+    alert("Submission failed. Please try again or contact MD Desk directly.");
+  }
+}
+
+function resetForm() {
+  ["name","role","email","pdate","adate","agenda"].forEach(id=>document.getElementById(id).value="");
+  ["dept","dur","purp","phr","pmin","ahr","amin"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("pampm").value="AM";
+  document.getElementById("aampm").value="AM";
+  document.getElementById("p2").checked=true;
+  document.getElementById("fname").textContent="";
+  document.getElementById("subbtn").disabled=false;
+  document.getElementById("subbtn").innerHTML='<span id="btntxt">Submit Request</span><span>→</span>';
+  document.querySelectorAll(".err").forEach(e=>e.classList.remove("err"));
+  document.querySelectorAll(".err-msg.show").forEach(e=>e.classList.remove("show"));
+  document.getElementById("formview").style.display="block";
+  document.getElementById("success").style.display="none";
+  window.scrollTo({top:0});
+}
+</script>
+</body>
+</html>
