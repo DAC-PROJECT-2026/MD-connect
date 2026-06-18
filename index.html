@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MD Connect — DAC Developers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:    #0033CC;
+  --blue-d:  #002299;
+  --blue-l:  #EEF2FF;
+  --orange:  #E84B1A;
+  --gold:    #C8A840;
+  --gold-l:  #FDF8EC;
+  --bg:      #F2F4F9;
+  --white:   #FFFFFF;
+  --border:  #E2E6F0;
+  --text:    #111827;
+  --muted:   #6B7280;
+  --label:   #374151;
+  --error:   #DC2626;
+  --success: #15803D;
+  --r:       10px;
+  --shadow:  0 8px 32px rgba(0,51,204,0.10);
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* ── HEADER ─────────────────────────────────────── */
+.header {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+.header-inner {
+  max-width: 780px; margin: 0 auto;
+  display: flex; align-items: center;
+  height: 52px; gap: 12px;
+}
+.header-logo img {
+  height: 30px; width: auto; display: block;
+}
+.header-logo-fallback {
+  display: none;
+  height: 30px; align-items: center; gap: 8px;
+}
+.header-logo-fallback .dac-badge {
+  width: 30px; height: 30px;
+  background: var(--blue);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 11px; color: #fff; letter-spacing: -0.5px;
+}
+.header-logo-fallback .dac-name {
+  font-size: 14px; font-weight: 800; color: var(--blue);
+  letter-spacing: -0.3px;
+}
+.header-divider {
+  width: 1px; height: 20px; background: var(--border); margin: 0 2px;
+}
+.header-product {
+  font-size: 12px; font-weight: 600; color: var(--muted);
+}
+.header-sep { flex: 1; }
+.header-pill {
+  background: var(--blue-l);
+  color: var(--blue);
+  border-radius: 20px;
+  padding: 4px 11px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* ── HERO ────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--blue) 0%, #0041ee 100%);
+  padding: 48px 32px 64px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(200,168,64,0.15) 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(232,75,26,0.12) 0%, transparent 50%);
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 1px; text-transform: uppercase;
+  margin-bottom: 20px;
+  position: relative;
+}
+.hero-eyebrow::before { content: '◆'; font-size: 8px; color: var(--gold); }
+.hero h1 {
+  font-size: 30px; font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  position: relative;
+  margin-bottom: 12px;
+}
+.hero h1 span { color: var(--gold); }
+.hero p {
+  font-size: 14px; color: rgba(255,255,255,0.7);
+  max-width: 420px; margin: 0 auto;
+  line-height: 1.6;
+  position: relative;
+}
+.hero-steps {
+  display: flex; justify-content: center; gap: 0;
+  margin-top: 28px;
+  position: relative;
+}
+.hero-step {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; width: 100px;
+  position: relative;
+}
+.hero-step:not(:last-child)::after {
+  content: '';
+  position: absolute; top: 15px; left: 60%;
+  width: 80%; height: 1px;
+  background: rgba(255,255,255,0.25);
+  border-top: 1px dashed rgba(255,255,255,0.3);
+}
+.hero-step-dot {
+  width: 30px; height: 30px;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+}
+.hero-step-label {
+  font-size: 10px; font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  text-align: center; line-height: 1.3;
+}
+
+/* ── FORM WRAPPER ────────────────────────────────── */
+.form-wrap {
+  max-width: 780px; margin: -28px auto 0;
+  padding: 0 20px;
+  position: relative; z-index: 1;
+}
+.form-card {
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+/* ── SECTION ─────────────────────────────────────── */
+.form-section {
+  padding: 28px 32px;
+  border-bottom: 1px solid var(--border);
+}
+.form-section:last-of-type { border-bottom: none; }
+
+.section-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 22px; }
+.section-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; flex-shrink: 0; margin-top: 1px;
+}
+.section-title { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+.section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+/* ── GRID ────────────────────────────────────────── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media (max-width: 580px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .form-section { padding: 22px 18px; }
+  .hero { padding: 36px 20px 52px; }
+  .hero h1 { font-size: 22px; }
+  .hero-steps { display: none; }
+  .header { padding: 0 14px; }
+}
+
+/* ── FIELDS ──────────────────────────────────────── */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 11px; font-weight: 700;
+  color: var(--label);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  display: flex; align-items: center; gap: 4px;
+}
+.req { color: var(--orange); }
+.field input, .field select, .field textarea {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  font-size: 13px; color: var(--text);
+  background: #FAFBFE;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  font-family: inherit;
+  -webkit-appearance: none;
+}
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px; cursor: pointer;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0,51,204,0.09);
+  background: #fff;
+}
+.field input.error, .field select.error, .field textarea.error {
+  border-color: var(--error);
+  background: #fff8f8;
+}
+.field textarea { resize: vertical; min-height: 96px; line-height: 1.6; }
+.char-count { font-size: 10px; color: var(--muted); text-align: right; }
+.time-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* ── SUBSECTION LABEL ────────────────────────────── */
+.sub-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sub-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.sub-label.primary { color: var(--blue); }
+.sub-label.secondary { color: var(--muted); }
+
+/* ── PRIORITY PILLS ──────────────────────────────── */
+.priority-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.priority-pill { position: relative; }
+.priority-pill input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.priority-pill label {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 16px; border-radius: 24px;
+  border: 1.5px solid var(--border);
+  background: #FAFBFE;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.18s;
+  user-select: none;
+}
+.priority-pill label:hover { border-color: var(--blue); background: var(--blue-l); }
+.priority-pill.low    input:checked + label { background: #DCFCE7; color: #15803D; border-color: #6EE7A0; }
+.priority-pill.medium input:checked + label { background: #FEF9C3; color: #92400E; border-color: #FCD34D; }
+.priority-pill.high   input:checked + label { background: #FEE2E2; color: #991B1B; border-color: #FCA5A5; }
+.priority-pill.critical input:checked + label { background: var(--orange); color: #fff; border-color: var(--orange); }
+.pdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.low .pdot    { background: #22C55E; }
+.medium .pdot { background: #EAB308; }
+.high .pdot   { background: #EF4444; }
+.critical .pdot { background: rgba(255,255,255,0.8); }
+
+/* ── FILE DROP ───────────────────────────────────── */
+.file-drop {
+  border: 2px dashed var(--border);
+  border-radius: var(--r);
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  background: #FAFBFE;
+  transition: all 0.18s;
+  position: relative;
+}
+.file-drop:hover { border-color: var(--blue); background: var(--blue-l); }
+.file-drop input[type="file"] {
+  position: absolute; inset: 0;
+  opacity: 0; cursor: pointer;
+  width: 100%; height: 100%;
+}
+.file-drop-icon { font-size: 28px; margin-bottom: 8px; }
+.file-drop p { font-size: 13px; color: var(--muted); }
+.file-drop strong { color: var(--blue); }
+.file-drop small { font-size: 11px; color: var(--muted); margin-top: 4px; display: block; }
+.file-name { margin-top: 10px; font-size: 12px; color: var(--success); font-weight: 600; display: none; }
+
+/* ── INFO BOX ────────────────────────────────────── */
+.info-box {
+  background: var(--blue-l);
+  border: 1px solid #C7D2FE;
+  border-left: 3px solid var(--blue);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12px; color: var(--blue);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* ── FOOTER / SUBMIT ─────────────────────────────── */
+.form-footer {
+  padding: 28px 32px;
+  background: #F8F9FE;
+  border-top: 1px solid var(--border);
+}
+.submit-btn {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, var(--blue) 0%, #0041ee 100%);
+  color: #fff; border: none;
+  border-radius: var(--r);
+  font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.18s, transform 0.1s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: inherit;
+  letter-spacing: 0.2px;
+  box-shadow: 0 4px 16px rgba(0,51,204,0.3);
+}
+.submit-btn:hover { opacity: 0.93; transform: translateY(-1px); }
+.submit-btn:active { transform: translateY(0); }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.submit-note {
+  text-align: center; font-size: 11px; color: var(--muted);
+  margin-top: 12px; line-height: 1.5;
+}
+.submit-note a { color: var(--blue); }
+
+/* ── SUCCESS ─────────────────────────────────────── */
+#successScreen { display: none; padding: 56px 32px; text-align: center; }
+.success-circle {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, #22C55E, #16A34A);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; margin: 0 auto 24px;
+  box-shadow: 0 8px 24px rgba(34,197,94,0.3);
+}
+#successScreen h2 {
+  font-size: 22px; font-weight: 800;
+  color: var(--text); margin-bottom: 10px;
+  letter-spacing: -0.3px;
+}
+#successScreen p { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 360px; margin: 0 auto; }
+.req-id-box {
+  margin: 24px auto;
+  background: var(--blue-l);
+  border: 1.5px solid #C7D2FE;
+  border-radius: 10px;
+  padding: 16px 24px;
+  display: inline-block;
+  font-size: 20px; font-weight: 800;
+  color: var(--blue); letter-spacing: 2px;
+}
+.success-note {
+  margin-top: 10px; font-size: 12px; color: var(--muted);
+  background: var(--gold-l);
+  border: 1px solid #E9D28A;
+  border-radius: 8px;
+  padding: 10px 16px;
+  display: inline-block;
+}
+
+/* ── TOAST ───────────────────────────────────────── */
+#errorToast {
+  display: none;
+  position: fixed; bottom: 28px;
+  left: 50%; transform: translateX(-50%);
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  color: #991B1B;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  z-index: 999;
+  white-space: nowrap; max-width: 92vw;
+}
+
+/* ── SPINNER ─────────────────────────────────────── */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2.5px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  display: none; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-inner">
+
+    <!-- Real DAC logo — falls back gracefully if it can't load -->
+    <a href="https://dacdevelopers.com" target="_blank" class="header-logo" id="logoLink">
+      <img
+        src="https://dacdevelopers.com/wp-content/uploads/2024/01/dac-logo.png"
+        alt="DAC Developers"
+        id="dacLogo"
+        onerror="this.closest('.header-logo').style.display='none'; document.getElementById('logoFallback').style.display='flex';"
+      >
+    </a>
+    <!-- Fallback if logo URL fails -->
+    <div class="header-logo-fallback" id="logoFallback">
+      <div class="dac-badge">DAC</div>
+      <div class="dac-name">DAC Developers</div>
+    </div>
+
+    <div class="header-divider"></div>
+    <div class="header-product">MD Connect</div>
+    <div class="header-sep"></div>
+    <div class="header-pill">Appointment Portal</div>
+  </div>
+</header>
+
+<!-- ── HERO ────────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-eyebrow">Internal Employee Portal</div>
+  <h1>Request a Meeting<br>with the <span>Managing Director</span></h1>
+  <p>Submit your appointment request and our EA team will review and confirm a slot within 1–2 business days.</p>
+
+  <div class="hero-steps">
+    <div class="hero-step">
+      <div class="hero-step-dot">📝</div>
+      <div class="hero-step-label">Submit<br>Request</div>
+    </div>
+    <div class="hero-step">
+      <div class="hero-step-dot">🔍</div>
+      <div class="hero-step-label">EA<br>Reviews</div>
+    </div>
+    <div class="hero-step">
+      <div class="hero-step-dot">📅</div>
+      <div class="hero-step-label">Meeting<br>Scheduled</div>
+    </div>
+    <div class="hero-step">
+      <div class="hero-step-dot">✅</div>
+      <div class="hero-step-label">Meeting<br>Completed</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FORM ─────────────────────────────────────────────── -->
+<div class="form-wrap">
+  <div class="form-card">
+
+    <!-- SUCCESS STATE -->
+    <div id="successScreen">
+      <div class="success-circle">✅</div>
+      <h2>Request Submitted Successfully!</h2>
+      <p>Your meeting request has been received and is now under review by the EA team.</p>
+      <div class="req-id-box" id="successReqId">—</div>
+      <br>
+      <div class="success-note">📧 A confirmation email has been sent to your inbox. Save your Reference ID for follow-up.</div>
+    </div>
+
+    <!-- FORM BODY -->
+    <div id="formContent">
+
+      <!-- SECTION 1 -->
+      <div class="form-section">
+        <div class="section-head">
+          <div class="section-num">1</div>
+          <div>
+            <div class="section-title">Your Information</div>
+            <div class="section-sub">These details are used to identify you and notify you at every step</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" id="name" placeholder="e.g. Subathra Rajendran" autocomplete="name">
+          </div>
+          <div class="field">
+            <label>Department <span class="req">*</span></label>
+            <select id="department">
+              <option value="">— Select Department —</option>
+              <option>Accounts</option><option>Administration</option>
+              <option>CBE - Marketing Sales &amp; CRM</option><option>CBE - Operations</option>
+              <option>Civil</option><option>Contracts</option><option>CP Sales</option>
+              <option>CRM</option><option>Design</option><option>ERP</option><option>FED</option>
+              <option>Finance</option><option>HR</option><option>IT</option>
+              <option>Land Acquisition</option><option>Lead Audit Team</option>
+              <option>Legal</option><option>Liaison</option>
+              <option>Management Engineering</option><option>Marketing</option>
+              <option>MEP</option><option>MIS</option><option>Operations</option>
+              <option>Pre Sales</option><option>Product Development</option>
+              <option>Public Affairs</option><option>Purchase and Stores</option>
+              <option>QA/QC</option><option>QS</option><option>Safety</option>
+              <option>Sales</option><option>Survey</option><option>Team HUG</option>
+              <option>Transport</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Role / Designation <span class="req">*</span></label>
+            <input type="text" id="role" placeholder="e.g. Senior Project Manager">
+          </div>
+          <div class="field">
+            <label>Work Email <span class="req">*</span></label>
+            <input type="email" id="email" placeholder="you@dacdevelopers.com" autocomplete="email">
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2 -->
+      <div class="form-section">
+        <div class="section-head">
+          <div class="section-num">2</div>
+          <div>
+            <div class="section-title">Preferred Schedule</div>
+            <div class="section-sub">Provide two time options — the EA will confirm based on the MD's calendar</div>
+          </div>
+        </div>
+
+        <div class="sub-label primary">Preferred Date &amp; Time <span class="req">*</span></div>
+        <div class="grid-3" style="margin-bottom:20px;">
+          <div class="field">
+            <label>Date <span class="req">*</span></label>
+            <input type="date" id="preferredDate">
+          </div>
+          <div class="field">
+            <label>Hour <span class="req">*</span></label>
+            <select id="preferredHour">
+              <option value="">— Hour —</option>
+              <option>08</option><option>09</option><option>10</option><option>11</option>
+              <option>12</option><option>01</option><option>02</option><option>03</option>
+              <option>04</option><option>05</option><option>06</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Min &amp; Period <span class="req">*</span></label>
+            <div class="time-mini">
+              <select id="preferredMin">
+                <option value="00">:00</option><option value="15">:15</option>
+                <option value="30">:30</option><option value="45">:45</option>
+              </select>
+              <select id="preferredAmPm"><option>AM</option><option>PM</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-label secondary">Alternate Date &amp; Time <span style="font-weight:500;text-transform:none;letter-spacing:0;">(recommended)</span></div>
+        <div class="grid-3" style="margin-bottom:20px;">
+          <div class="field">
+            <label>Alt. Date</label>
+            <input type="date" id="altDate">
+          </div>
+          <div class="field">
+            <label>Hour</label>
+            <select id="altHour">
+              <option value="">— Hour —</option>
+              <option>08</option><option>09</option><option>10</option><option>11</option>
+              <option>12</option><option>01</option><option>02</option><option>03</option>
+              <option>04</option><option>05</option><option>06</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Min &amp; Period</label>
+            <div class="time-mini">
+              <select id="altMin">
+                <option value="00">:00</option><option value="15">:15</option>
+                <option value="30">:30</option><option value="45">:45</option>
+              </select>
+              <select id="altAmPm"><option>AM</option><option>PM</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field" style="max-width:260px;">
+          <label>Meeting Duration <span class="req">*</span></label>
+          <select id="duration">
+            <option value="">— Select duration —</option>
+            <option value="15">15 minutes</option>
+            <option value="30" selected>30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">1 hour</option>
+            <option value="90">1.5 hours</option>
+            <option value="120">2 hours</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- SECTION 3 -->
+      <div class="form-section">
+        <div class="section-head">
+          <div class="section-num">3</div>
+          <div>
+            <div class="section-title">Meeting Details</div>
+            <div class="section-sub">A clear agenda helps the MD prepare and makes the meeting more productive</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div class="field">
+            <label>Purpose of Meeting <span class="req">*</span></label>
+            <select id="purpose">
+              <option value="">— Select purpose —</option>
+              <option>Business Update/Review</option>
+              <option>Project Progress Update</option>
+              <option>Budget/Finance Discussion</option>
+              <option>Escalation/Issue Resolution</option>
+              <option>New Initiative/Proposal Pitch</option>
+              <option>Approval/Sign-off Required</option>
+              <option>Performance Discussion</option>
+              <option>Vendor/Partner/Client Meeting</option>
+              <option>Recruitment/HR Decision</option>
+              <option>Legal/Compliance Matter</option>
+              <option>Land/Liaison Matter</option>
+              <option>Design/Technical Review</option>
+              <option>Safety/QA Discussion</option>
+              <option>Strategic Planning</option>
+              <option>Feedback/Suggestion</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Priority Level <span class="req">*</span></label>
+            <div class="priority-group" style="margin-top:2px;">
+              <div class="priority-pill low">
+                <input type="radio" name="priority" id="p-low" value="Low">
+                <label for="p-low"><span class="pdot"></span>Low</label>
+              </div>
+              <div class="priority-pill medium">
+                <input type="radio" name="priority" id="p-medium" value="Medium" checked>
+                <label for="p-medium"><span class="pdot"></span>Medium</label>
+              </div>
+              <div class="priority-pill high">
+                <input type="radio" name="priority" id="p-high" value="High">
+                <label for="p-high"><span class="pdot"></span>High</label>
+              </div>
+              <div class="priority-pill critical">
+                <input type="radio" name="priority" id="p-critical" value="Critical">
+                <label for="p-critical"><span class="pdot"></span>Critical</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Meeting Agenda <span class="req">*</span></label>
+          <textarea id="agenda" placeholder="Describe what you wish to discuss, key decisions needed, and expected outcomes. The clearer the agenda, the better the MD can prepare." maxlength="1000"></textarea>
+          <div class="char-count"><span id="agendaCount">0</span> / 1000</div>
+        </div>
+      </div>
+
+      <!-- SECTION 4 -->
+      <div class="form-section">
+        <div class="section-head">
+          <div class="section-num">4</div>
+          <div>
+            <div class="section-title">Supporting Document</div>
+            <div class="section-sub">Optional — attach a brief, report, or any relevant document</div>
+          </div>
+        </div>
+        <div class="file-drop" id="fileDrop">
+          <input type="file" id="attachment" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg">
+          <div class="file-drop-icon">📎</div>
+          <p><strong>Click to upload</strong> or drag and drop here</p>
+          <small>PDF, Word, Excel, PowerPoint or Image &nbsp;·&nbsp; Max 5 MB</small>
+          <div class="file-name" id="fileName">✅ &nbsp;<span id="fileNameText"></span></div>
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="form-footer">
+        <button type="button" class="submit-btn" id="submitBtn" onclick="submitForm()">
+          <span id="submitText">Submit Appointment Request</span>
+          <div class="spinner" id="submitSpinner"></div>
+        </button>
+        <p class="submit-note">
+          By submitting, you confirm this information is accurate. &nbsp;·&nbsp; Questions? Contact
+          <a href="mailto:mddesk@dacdevelopers.com">mddesk@dacdevelopers.com</a>
+        </p>
+      </div>
+
+    </div><!-- /formContent -->
+  </div><!-- /form-card -->
+</div><!-- /form-wrap -->
+
+<div id="errorToast"></div>
+
+<script>
+  // ── CONFIG ────────────────────────────────────────────────
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzYVnUVcLsugMTfh-fDoZewcFQAHXXLlVkU9y-vv2cvHpzhC83IKrlBHmcUtt_v9eHHyA/exec";
+
+  // ── INIT ──────────────────────────────────────────────────
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('preferredDate').min = today;
+  document.getElementById('altDate').min = today;
+
+  // Agenda counter
+  const agendaEl = document.getElementById('agenda');
+  const countEl  = document.getElementById('agendaCount');
+  agendaEl.addEventListener('input', () => { countEl.textContent = agendaEl.value.length; });
+
+  // File upload
+  const fileInput    = document.getElementById('attachment');
+  const fileNameEl   = document.getElementById('fileName');
+  const fileNameText = document.getElementById('fileNameText');
+  const fileDrop     = document.getElementById('fileDrop');
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) {
+      fileNameText.textContent = fileInput.files[0].name;
+      fileNameEl.style.display = 'block';
+    }
+  });
+  fileDrop.addEventListener('dragover',  e => { e.preventDefault(); fileDrop.style.borderColor = 'var(--blue)'; });
+  fileDrop.addEventListener('dragleave', () => { fileDrop.style.borderColor = ''; });
+  fileDrop.addEventListener('drop', e => {
+    e.preventDefault(); fileDrop.style.borderColor = '';
+    if (e.dataTransfer.files.length) {
+      fileNameText.textContent = e.dataTransfer.files[0].name;
+      fileNameEl.style.display = 'block';
+    }
+  });
+
+  // ── HELPERS ───────────────────────────────────────────────
+  function buildTime(hourId, minId, ampmId) {
+    const h = document.getElementById(hourId).value;
+    if (!h) return "";
+    return h + ":" + document.getElementById(minId).value + " " + document.getElementById(ampmId).value;
+  }
+
+  // ── VALIDATION ────────────────────────────────────────────
+  function validate() {
+    document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+    const checks = [
+      { id: 'name',          label: 'Full Name' },
+      { id: 'department',    label: 'Department' },
+      { id: 'role',          label: 'Role / Designation' },
+      { id: 'email',         label: 'Work Email' },
+      { id: 'preferredDate', label: 'Preferred Date' },
+      { id: 'preferredHour', label: 'Preferred Time (Hour)' },
+      { id: 'duration',      label: 'Meeting Duration' },
+      { id: 'purpose',       label: 'Purpose of Meeting' },
+      { id: 'agenda',        label: 'Meeting Agenda' },
+    ];
+    let firstError = null;
+    for (const c of checks) {
+      const el = document.getElementById(c.id);
+      if (!el.value.trim()) {
+        el.classList.add('error');
+        if (!firstError) firstError = { el, label: c.label };
+      }
+    }
+    const emailEl = document.getElementById('email');
+    if (emailEl.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
+      emailEl.classList.add('error');
+      if (!firstError) firstError = { el: emailEl, label: 'Valid Email Address' };
+    }
+    if (firstError) {
+      showError('Please fill in: ' + firstError.label);
+      firstError.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return false;
+    }
+    return true;
+  }
+
+  // ── SUBMIT ────────────────────────────────────────────────
+  async function submitForm() {
+    if (!validate()) return;
+
+    const btn         = document.getElementById('submitBtn');
+    const submitTextEl = document.getElementById('submitText');
+    const spinner     = document.getElementById('submitSpinner');
+    btn.disabled = true;
+    submitTextEl.textContent = 'Submitting…';
+    spinner.style.display = 'inline-block';
+
+    const params = new URLSearchParams();
+    params.append('action',        'submitRequest');
+    params.append('name',          document.getElementById('name').value.trim());
+    params.append('department',    document.getElementById('department').value);
+    params.append('role',          document.getElementById('role').value.trim());
+    params.append('email',         document.getElementById('email').value.trim());
+    params.append('preferredDate', document.getElementById('preferredDate').value);
+    params.append('preferredTime', buildTime('preferredHour', 'preferredMin', 'preferredAmPm'));
+    params.append('altDate',       document.getElementById('altDate').value);
+    params.append('altTime',       buildTime('altHour', 'altMin', 'altAmPm'));
+    params.append('duration',      document.getElementById('duration').value);
+    params.append('purpose',       document.getElementById('purpose').value);
+    params.append('priority',      document.querySelector('input[name="priority"]:checked').value);
+    params.append('agenda',        document.getElementById('agenda').value.trim());
+    const file = document.getElementById('attachment').files[0];
+    if (file) params.append('attachmentName', file.name);
+
+    try {
+      const resp = await fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
+        redirect: 'follow',
+      });
+      const responseText = await resp.text();
+      let result;
+      try { result = JSON.parse(responseText); }
+      catch (e) { result = { success: true, requestId: "Check your email" }; }
+
+      if (result.success) {
+        document.getElementById('formContent').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+        document.getElementById('successReqId').textContent = result.requestId;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        showError(result.message || 'Submission failed. Please try again.');
+        btn.disabled = false;
+        submitTextEl.textContent = 'Submit Appointment Request';
+        spinner.style.display = 'none';
+      }
+    } catch (err) {
+      showError('Could not connect. Please check your internet and try again.');
+      btn.disabled = false;
+      submitTextEl.textContent = 'Submit Appointment Request';
+      spinner.style.display = 'none';
+    }
+  }
+
+  function showError(msg) {
+    const t = document.getElementById('errorToast');
+    t.textContent = msg; t.style.display = 'block';
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => t.style.display = 'none', 4500);
+  }
+</script>
+
+</body>
+</html>
